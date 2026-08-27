@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>业务对象识别规则 · 正向识别原则（数据建模统一标准 V2.0）</title>
+<style>
+  :root{
+    --bg:#ffffff; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+    --brand:#1d4ed8; --brand-soft:#eff6ff; --accent:#0f766e; --warn:#b91c1c;
+    --warn-soft:#fef2f2; --ok:#15803d; --ok-soft:#f0fdf4; --chip:#f3f4f6;
+    --purple:#7c3aed; --purple-soft:#f5f3ff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--ink);background:#f7f8fa;line-height:1.7;}
+  .page{max-width:1000px;margin:0 auto;background:var(--bg);padding:40px 48px 56px;
+    box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  header{border-bottom:3px solid var(--brand);padding-bottom:18px;margin-bottom:8px;}
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:.5px;}
+  .sub{color:var(--muted);font-size:14px;}
+  .tag{display:inline-block;background:var(--brand-soft);color:var(--brand);
+    font-size:12px;padding:3px 10px;border-radius:12px;margin-top:10px;font-weight:600;margin-right:6px;}
+  .tag.p{background:var(--purple-soft);color:var(--purple);}
+  nav{background:var(--chip);border-radius:10px;padding:14px 18px;margin:22px 0 30px;font-size:13px;}
+  nav b{color:var(--brand);} nav a{color:var(--ink);text-decoration:none;margin-right:12px;white-space:nowrap;}
+  nav a:hover{color:var(--brand);}
+  h2{font-size:19px;margin:34px 0 12px;padding-left:11px;border-left:4px solid var(--brand);}
+  h3{font-size:15px;margin:20px 0 8px;color:var(--accent);}
+  h4{font-size:13.5px;margin:14px 0 6px;color:var(--purple);}
+  p{margin:8px 0;font-size:14.5px;}
+  .lead{font-size:15px;background:var(--brand-soft);border-left:4px solid var(--brand);
+    padding:14px 18px;border-radius:0 8px 8px 0;margin:14px 0;}
+  ul,ol{margin:8px 0;padding-left:22px;font-size:14.5px;}
+  li{margin:5px 0;}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+  th,td{border:1px solid var(--line);padding:9px 11px;vertical-align:top;text-align:left;}
+  th{background:var(--brand-soft);color:var(--brand);font-weight:600;}
+  tr:nth-child(even) td{background:#fafafa;}
+  .dim{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:16px 0;}
+  .card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fff;}
+  .card .n{display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;
+    background:var(--brand);color:#fff;border-radius:50%;font-size:13px;font-weight:700;}
+  .card h3{margin:10px 0 6px;}
+  .card p{font-size:12.5px;margin:0;color:var(--muted);}
+  .rule{background:var(--warn-soft);border:1px solid #fca5a5;border-radius:10px;
+    padding:14px 18px;margin:16px 0;}
+  .rule b{color:var(--warn);}
+  .ok{background:var(--ok-soft);border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;margin:14px 0;}
+  .ok b{color:var(--ok);}
+  .kw{color:var(--brand);font-weight:600;}
+  .kw2{color:var(--purple);font-weight:600;}
+  svg{display:block;max-width:100%;height:auto;margin:18px auto;background:#fff;
+    border:1px solid var(--line);border-radius:10px;}
+  footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;
+    color:var(--muted);font-size:12px;text-align:center;}
+  .note{font-size:12.5px;color:var(--muted);font-style:italic;}
+  .pill{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:10px;font-weight:600;}
+  .pill.own{background:var(--ok-soft);color:var(--ok);border:1px solid #bbf7d0;}
+  .pill.mir{background:var(--warn-soft);color:var(--warn);border:1px solid #fca5a5;}
+  .pill.att{background:var(--chip);color:var(--muted);border:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>业务对象识别规则 · 正向识别原则</h1>
+    <div class="sub">ToB 离散制造 · 合同管理 / 投标管理产品 · 数据建模统一标准</div>
+    <span class="tag">V2.0 · 统一标准</span>
+    <span class="tag p">含跨主体双视角归属修正层</span>
+  </header>
+
+  <section id="s1">
+    <h2>1 文档定位与适用范围</h2>
+    <p>本规则用于指导<b>所有业务领域</b>的<b>业务对象（Business Object, BO）识别与建模</b>，适用于 L3 流程活动流向下钻至 L4/L5 时的数据对象梳理、主数据与事务数据划分，以及后续实体—关系设计。</p>
+  </section>
+
+  <nav>
+    <b>目录</b><br>
+    <a href="#s1">1 文档定位与适用范围</a>
+    <a href="#s2">2 业务对象的定义、内涵与外延</a>
+    <a href="#s3">3 核心原则：正向识别</a>
+    <a href="#s4">4 核心方法：沿业务流识别（七步）</a>
+    <a href="#s5">5 识别标准（三大维度）</a>
+    <a href="#s6">6 双视角归属原则（跨主体修正层）</a>
+    <a href="#s7">7 典型对象辨析</a>
+    <a href="#s8">8 识别流程可视化</a>
+    <a href="#s9">9 禁止项与落地要求</a>
+    <a href="#s10">10 识别方法总览</a>
+  </nav>
+
+  <section id="s2">
+    <h2>2 业务对象的定义、内涵与外延</h2>
+    <div class="lead">
+      业务对象（Business Object, BO）是业务流程中可被<b>独立识别、独立治理、独立生命周期管理</b>的"事物（人/事/物）"的数字化表征，是数据建模的原子单元，<b>区别于报表字段、表单控件与技术存储结构</b>。其权威定义采用<b>华为《数据之道》信息架构方法论</b>：
+    </div>
+    <div style="background:#f8fafc;border-left:4px solid var(--accent);padding:14px 18px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px;">
+      <b>华为定义：</b>业务对象是指<b>业务领域中重要的人、事、物对象</b>。业务对象承载了业务运作和管理涉及的重要信息，是信息架构中最重要的管理要素；同时它还是业务与 IT 的关键连接点，也是实现 IA（信息架构）、BA（业务架构）、AA（应用架构）、TA（技术架构）集成的关键要素。
+    </div>
+
+    <h3>2.1 内涵（Connotation · 对定义的内在展开）</h3>
+    <p>华为定义包含六层内涵——一个"事物"之所以被界定为业务对象，正是因为这六层含义同时成立：</p>
+    <ul>
+      <li><b>① 客观存在性与重要性（人/事/物）</b>：业务对象是业务运作与管理中<b>不可缺少的重要人、事、物</b>，对应真实可区分的实体（客户、合同、产品、项目），而非技术表、报表指标或表单字段；通常配套管理流程、管理组织与 IT 系统（如"客户"对应客户管理部 + CRM + 客户信息流程）。</li>
+      <li><b>② 信息载体性（信息架构核心）</b>：承载业务运作与管理决策所需的重要信息，是信息架构（IA）最重要的管理要素，也是企业数据资产的核心单元（对应数据资产目录 L3 业务对象层）。</li>
+      <li><b>③ 架构连接性（业务↔IT、EA 集成关键）</b>：是业务与 IT 的"沟通桥梁"，通过它实现 IA–BA–AA–TA 的架构集成——向上承接业务流程（BA），向下落地应用（AA）与技术（TA）。</li>
+      <li><b>④ 四维本质特征（华为归纳的业务对象特征）</b>：
+        <ul>
+          <li><b>唯一身份标识</b>：每个实例在企业范围内有唯一 ID（如工号、产品分类编号），杜绝"一物多码"。</li>
+          <li><b>相互独立、唯一、不可重叠</b>：对象间边界清晰，不互相包含。</li>
+          <li><b>相对稳定，且与组织和流程解耦</b>：不因某组织/流程调整而消失，是可跨流程、跨组织复用的稳定实体。</li>
+          <li><b>可实例化、包含多条记录</b>：可映射到具体业务实例（如"项目"→"某迁移项目 P202601"），支持业务交易与数据记录。</li>
+        </ul>
+      </li>
+      <li><b>⑤ 属性内聚性（属性从属对象）</b>：属性描述对象的数据特征，<b>从属于业务对象、不可独立存在</b>，是信息架构最小颗粒（定义库表列）；同一对象属性需逻辑相关（属性内聚），不混入他对象属性。</li>
+      <li><b>⑥ 唯一数据 Owner 治理</b>：为避免管理冲突，业务对象在企业内通常只有<b>唯一数据 Owner</b>，由其制定架构/标准/管理规则、监控数据质量——与本规则"责任主体（Owner）分离"维度一致。</li>
+    </ul>
+    <div class="ok">
+      <b>华为四维特征 ↔ 本规则三维判定（映射对照）：</b>
+      <ul style="margin:8px 0 0">
+        <li>唯一身份标识 ↔ 主键规则 / <b>引用 vs 嵌入</b>（属性不独立成 BO）</li>
+        <li>相互独立、不可重叠 ↔ <b>归属方分离</b>（跨主体时归属方 ≠ 视角 → 外部引用镜像）</li>
+        <li>相对稳定、与流程解耦、可复用 ↔ <b>生命周期独立性</b>（自有完整生命周期）</li>
+        <li>属性内聚、从属不可独立 ↔ <b>引用 vs 嵌入</b>（附着属性不独立建模）</li>
+        <li>唯一数据 Owner ↔ <b>责任主体（Owner）</b>维度</li>
+      </ul>
+      <p style="margin:8px 0 0;font-size:12.5px;color:var(--muted);">说明：华为定义默认"企业内单一视角"。本规则在其基础上增加<b>双视角归属原则</b>（§6），以处理 ToB 离散制造合同/投标域的跨主体（买方/卖方）场景——这是华为方法在本领域的延伸，而非冲突。</p>
+    </div>
+
+    <h3>2.2 外延（Extension · 范围边界）</h3>
+    <p>基于华为"相互独立、不可重叠"与"属性内聚（从属不可独立）"内涵，外延进一步划清 BO 与"非 BO"的实例边界——哪些算作业务对象、哪些落在边界之外：</p>
+    <table>
+      <thead><tr><th style="width:20%">边界</th><th style="width:46%">典型实例</th><th style="width:34%">说明</th></tr></thead>
+      <tbody>
+        <tr><td><b>属于 BO（内）</b></td><td>主数据：客户、物料/产品、组织人员</td><td>稳定、跨流程共享、被引用</td></tr>
+        <tr><td>属于 BO（内）</td><td>事务类（重点排查）：项目计划、项目风险、发货单、报价、合同、投标项目、履约行/SO 行/PO 行、招标书接收档案</td><td>具独立生命周期的事务实体</td></tr>
+        <tr><td><b>边界外（非 BO）</b></td><td>组合子实体：合同行、框架合同行</td><td>嵌入父对象、随父生灭（执行侧可抽成履约行）</td></tr>
+        <tr><td>边界外（非 BO）</td><td>附着属性：审批意见、签字、操作日志</td><td>附着主对象，无独立事务</td></tr>
+        <tr><td>边界外（非 BO）</td><td>外部引用镜像：招标书/释放行（响应方侧）</td><td>仅镜像引用 + 下游接收档案，不进内部审批流</td></tr>
+        <tr><td>边界外（非 BO）</td><td>不可变值对象：价格/佣金快照、回执</td><td>独立存储但无状态机</td></tr>
+        <tr><td>边界外（非 BO）</td><td>派生/投影：线索就绪投影、CommercialProjectID</td><td>无生命周期，不计入对象清单</td></tr>
+        <tr><td>边界外（非 BO）</td><td>报表/BI 指标、表单字段、技术表/视图</td><td>非 BO 本身，是 BO 的呈现或存储</td></tr>
+      </tbody>
+    </table>
+
+    <h3>2.3 内涵 ⇄ 外延 一句话</h3>
+    <p><b>内涵（华为定义的内在展开）决定"是不是 BO"（判定标准），外延决定"哪些算 BO"（实例集合）</b>。本规则后续各节（正向识别 → 三维判定 → 双视角修正 → 生命周期复核）都是对华为内涵的可执行展开，最终落到外延的清晰边界上。</p>
+  </section>
+
+  <section id="s3">
+    <h2>3 核心原则：正向识别</h2>
+    <div class="lead">
+      正向识别是<b>从业务能力出发，自上而下在业务流中，识别业务需要管理的对象</b>。
+    </div>
+    <ul>
+      <li><b>正向路径</b>：业务能力 → 业务流（L3/L4 活动节点）→ 业务需要管理的对象（人/事/物）。</li>
+      <li><b>逆向路径（摒弃）</b>：BI 指标/报表 → 表单字段 → 反推对象。该路径易受展示口径干扰，导致对象被裁剪、合并或遗漏。</li>
+      <li><b>风险偏好</b>：主数据（如客户、物料）不易遗漏；<b>事务数据（如风险、计划、发货单）易漏或设计不当，需重点排查</b>。</li>
+    </ul>
+    <p class="note">注：正向识别是「取流」方法，本身不解决「跨主体视角不同导致判定相反」的问题——该问题由第 6 节双视角归属原则修正。</p>
+  </section>
+
+  <section id="s4">
+    <h2>4 核心方法：沿业务流识别（七步）</h2>
+    <p>沿业务流逐节点分析每个活动环节所涉及的<b>人、事、物</b>，据此识别具备独立事务特征的业务对象。识别前须先<b>声明建模视角</b>作为前置动作：</p>
+    <ol>
+      <li><b>① 声明视角</b>：先声明本次识别的建模视角——买方侧 / 卖方侧 / 中立（端到端）。<b>未声明视角不得下结论</b>（对应 DV-01）。</li>
+      <li><b>② 取流</b>：锁定一条 L3 业务流及其 L4 活动节点（买方侧、卖方侧或端到端），明确各节点的发起方。</li>
+      <li><b>③ 拆节点</b>：对每个节点问——谁在做？产生/消费了什么？涉及哪类实体？由哪一方发起？</li>
+      <li><b>④ 列候选</b>：将节点中出现的独立"事物"列为业务对象候选。</li>
+      <li><b>⑤ 判维度</b>：以三大维度（生命周期独立性 / 归属方分离 / 引用 vs 嵌入）+ 双视角归属修正，判定候选的归属类型（见第 5、6 节）。</li>
+      <li><b>⑥ 生命周期复核</b>：复核该对象是否需被独立地"计划→执行→监控→关闭"，区分受管实体 / 不可变值对象 / 引用镜像，确定生命周期等级与落库口径（见第 10 节）。</li>
+      <li><b>⑦ 出清单</b>：形成带「归属类型 + 生命周期等级」标签的业务对象清单，进入数据建模。</li>
+    </ol>
+  </section>
+
+  <section id="s5">
+    <h2>5 业务对象识别标准（三大维度）</h2>
+    <p>判断候选对象是否为独立业务对象，应同时审视以下三个核心维度。在<b>单一建模视角内</b>，任一维度显著成立即作为独立业务对象候选；在<b>跨主体场景</b>（归属方 ≠ 建模视角），归属方分离维度转为决定性修正信号（见第 6 节），此时对象判为外部引用镜像而非内部独立 BO。三类归属结论（自有 BO / 组合子实体 / 外部引用镜像 / 附着属性）由第 6 节与第 10 节共同定稿。</p>
+    <div class="dim">
+      <div class="card">
+        <span class="n">1</span>
+        <h3>生命周期独立性</h3>
+        <p>拥有独立的状态流转。例如项目风险、项目计划均有独立于项目的生命周期，状态变更不依附于主对象。<br><b>视角限定：</b>该维度只在「发起方侧」成立（见 §6.4）。</p>
+      </div>
+      <div class="card">
+        <span class="n">2</span>
+        <h3>责任主体（Owner）不同</h3>
+        <p>主责角色分离即应独立建模。如项目由 PD 主责，风险由 PC 管控。<br><b>跨主体决定性：</b>归属方 ≠ 当前建模视角时，该维度直接决定判为「外部引用镜像」（见 §6）。</p>
+      </div>
+      <div class="card">
+        <span class="n">3</span>
+        <h3>引用而非内嵌</h3>
+        <p>后续对象可引用前序对象属性；但若该值可独立变化、或仅以快照存储，则应独立存在，而非内嵌。<br><b>跨主体：</b>外部对象与响应方是「引用/触发」关系，不是「嵌入」父对象内部。</p>
+      </div>
+    </div>
+    <h3>5.4 跨 L3 谨慎原则</h3>
+    <p>原则上<b>L3 内应自闭环</b>；若业务对象确需跨 L3 引用或共享，须<b>充分论证必要性</b>（如跨域主数据、全局配置），并在标准中记录论证结论，避免随意跨域耦合。</p>
+  </section>
+
+  <section id="s6">
+    <h2>6 双视角归属原则（跨主体修正层）</h2>
+    <div class="lead">
+      同一对象在买方侧与卖方侧的 BO 判定结果可能相反。若不明确视角直接套三维判定，会把「外部驱动对象」误当成「内部可控对象」。本原则作为「从业务流正向推导」在跨主体场景下的<b>修正项</b>，与三大维度、二次复核并列。
+    </div>
+
+    <h3>6.1 触发场景</h3>
+    <p>合同管理、投标管理中反复出现一类对象：<b>由交易一方发起、另一方响应</b>（如招标书由买方发、框架释放行由买方释放）。这类对象若在卖方侧用正向三维直接判定，会得到错误结论——因为它在卖方侧不是「正向推导」出来的，而是被外部驱动的。</p>
+
+    <h3>6.2 核心规则 Rule-DV-01</h3>
+    <ul>
+      <li><b>① 先声明视角，再判定 BO。</b>任何业务对象识别必须先声明建模视角（买方侧 / 卖方侧 / 中立）。同一对象在不同视角下 BO 结论可能相反，不声明视角即判无效。</li>
+      <li><b>② 「买方发起、卖方响应」类对象，卖方侧一律按「外部引用镜像 + 自有接收/响应档案」处理。</b>其自有 BO 落在响应链下游（投标项目 → 投标书 → 合同 → 履约），而非该外部对象本身。</li>
+      <li><b>③ 归属方分离维度在跨主体场景具决定性。</b>当对象归属方（发起方）与当前建模视角（响应方）不一致时，当前侧该对象判定为「外部引用镜像」，不进入内部创建/审批链。</li>
+      <li><b>④ 生命周期独立性只在「发起方侧」成立。</b>响应方侧即便对象有接收、确认、执行等状态变化，也是被动跟随发起方，不构成「自有完整生命周期」。</li>
+    </ul>
+
+    <h3>6.3 双视角判定逻辑</h3>
+    <p>第 4 节已给出完整七步流程；跨主体场景的判定结论与落库口径按下表确定：</p>
+    <table>
+      <thead><tr><th style="width:34%">判定情形</th><th style="width:33%">归属结论</th><th style="width:33%">落库口径</th></tr></thead>
+      <tbody>
+        <tr><td>归属方（发起方）= 建模视角，且三维显著成立</td><td><span class="pill own">自有业务对象</span></td><td>独立建表，配状态机</td></tr>
+        <tr><td>归属方（发起方）≠ 建模视角（跨主体）</td><td><span class="pill mir">外部引用镜像</span></td><td>经外键引用，不参与内部创建/审批流；响应方建「接收/响应档案」自有 BO</td></tr>
+        <tr><td>三维均弱，且随父对象生灭</td><td>组合子实体（非 BO）</td><td>嵌入父对象</td></tr>
+        <tr><td>仅为附着性内容（审批意见/签字/日志）</td><td>附着属性（非 BO）</td><td>作为主对象属性或关联记录</td></tr>
+      </tbody>
+    </table>
+    <p class="note">关键分支：当三维判定中「归属方分离」判出<b>归属方 ≠ 当前建模视角</b>时，直接判「外部引用镜像」，但仍须走第 4 节第 ⑥ 步确认响应方侧是否有「接收/响应档案」这类自有 BO。</p>
+
+    <h3>6.4 维度级判定要点（双视角）</h3>
+    <ul>
+      <li><b>生命周期独立性</b>：在发起方侧通常强（对象先于合同生灭）；在响应方侧被「被动跟随」削弱，不构成自有生命周期。</li>
+      <li><b>归属方分离</b>：双视角场景的<b>决定性维度</b>。归属方与建模视角一致 → 可能自有 BO；不一致 → 引用镜像。</li>
+      <li><b>引用 vs 嵌入</b>：响应方侧的外部对象是「引用 / 触发」关系（登记并据以创建下游对象），不是「嵌入」父对象内部的组合结构。</li>
+      <li><b>二次复核（完整生命周期）</b>：双轨处理——发起方独立管其全生命周期；响应方只对「外部对象」做接收档案管理、对「响应动作」做自有 BO 管理。</li>
+    </ul>
+
+    <h3>6.5 标准识别条文（可落地条款）</h3>
+    <table>
+      <thead><tr><th style="width:10%">编号</th><th style="width:62%">条文</th><th style="width:28%">适用</th></tr></thead>
+      <tbody>
+        <tr><td>DV-01</td><td>识别 BO 前必须声明视角，未声明视角不得下结论</td><td>全部</td></tr>
+        <tr><td>DV-02</td><td>归属方与建模视角不一致的对象，建模为「外部引用镜像」，经外键关联下游自有 BO</td><td>跨主体</td></tr>
+        <tr><td>DV-03</td><td>外部引用镜像对象不参与建模方内部创建 / 审批流，状态随发起方联动</td><td>跨主体</td></tr>
+        <tr><td>DV-04</td><td>响应方应对外部对象建「接收 / 响应档案」自有对象（记录获取、截止、关联、附件、状态），该档案才是响应方自有 BO</td><td>卖方侧</td></tr>
+        <tr><td>DV-05</td><td>同一实体在买方侧为 BO、卖方侧为引用镜像时，落库用同一张物理表 + 视角角色字段区分，避免建两套</td><td>双视角产品</td></tr>
+        <tr><td>DV-06</td><td>「买方发起、卖方响应」类对象的下游响应链（投标项目 / 合同 / 履约行）才是响应方真正需要正向推导的自有 BO</td><td>卖方侧</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.6 正反例对照表（双视角）</h3>
+    <table>
+      <thead><tr><th style="width:20%">对象</th><th style="width:16%">买方侧</th><th style="width:18%">卖方侧</th><th style="width:14%">双视角结论</th><th style="width:14%">决定性维度</th><th style="width:18%">对应流程分类</th></tr></thead>
+      <tbody>
+        <tr><td>合同行 CONTRACT_LINE</td><td>组合子实体</td><td>组合子实体</td><td>双视角一致·非 BO</td><td>生命周期嵌套/嵌入</td><td>嵌入合同头</td></tr>
+        <tr><td>框架释放行 RELEASE_LINE</td><td><span class="pill own">自有 BO</span></td><td><span class="pill mir">外部引用镜像</span></td><td>双视角分裂</td><td>归属方分离（买方发起）</td><td>框架下标准/非标 PO 上游</td></tr>
+        <tr><td>招标书 / RFQ / RFP</td><td><span class="pill own">自有 BO</span></td><td><span class="pill mir">外部镜像+接收档案</span></td><td>双视角分裂</td><td>归属方分离（买方发起）</td><td>投标①获取②招标书</td></tr>
+        <tr><td>履约行 / SO 行 / PO 行</td><td>—</td><td><span class="pill own">自有 BO</span></td><td>单视角（执行侧）</td><td>执行侧正向推导</td><td>标准/无框架/框架下 PO</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.7 反例详解</h3>
+    <h4>反例 1：把「合同行」当成一级 BO</h4>
+    <p>❌ 错误认知：合同行有独立行号、单价、数量，应能独立管理。✅ 正确判定：合同行是合同的<b>组合子实体（part-of）</b>，非 BO。📌 原因：三维均弱——生命周期嵌套于合同、归属方与合同头同一、默认嵌入合同内。仅在框架/项目型需按行交付时，才在执行侧抽成独立的「履约行」BO。</p>
+    <h4>反例 2：把「框架释放行」在卖方侧建模为自有 BO</h4>
+    <p>❌ 错误认知：释放行有独立编号、数量、交期，应在卖方合同系统建为自有 BO、走内部审批。✅ 正确判定：卖方侧 RELEASE_LINE 是<b>外部引用镜像</b>。📌 原因：归属方分离决定性——释放动作主权在买方，卖方仅接收确认、据以生成自有 SO 行/履约行，不应进入内部创建/审批流。</p>
+    <h4>反例 3：在卖方侧建模「招标书」的编制生命周期</h4>
+    <p>❌ 错误认知：招标书重要，应管理其编制、发布、答疑、评标全流程。✅ 正确判定：卖方侧只建<b>「招标书接收档案」</b>自有对象，外部内容仅镜像引用。📌 原因：归属方分离 + 生命周期独立性只在买方侧成立，卖方侧对招标书是"响应"，自有 BO 是"投标项目"。</p>
+    <h4>正例锚定：履约行 / SO 行 / PO 行是卖方自有 BO</h4>
+    <p>✅ 正确判定：执行侧对象由卖方正向推导、拥有独立执行生命周期（计划→发货→验收→开票→回款），是真正的自有 BO。📌 原因：这类对象不是"买方发起、卖方响应"，而是卖方履约自身产生的执行实体，三维均强，应作为一级 BO 建表。这划清了"外部引用镜像"与"自有执行 BO"的边界。</p>
+
+    <h3>6.8 对数据架构的落点 · 对象关系蓝图</h3>
+    <ol>
+      <li><b>外部引用镜像约束</b>：接收渠道（EDI/接口/手工）、关联外部单号、经外键（如 <code>FK release_id</code>、<code>FK tender_id</code>）驱动下游自有对象；状态机跟随发起方，不参与内部审批。</li>
+      <li><b>自有 BO 下游落点</b>：投标项目 → 投标书 → 合同 → 履约行 → SO 行/交货行/开票行/PO 行，整条才是卖方侧需正向推导、独立建表的对象链。</li>
+      <li><b>与「合同 vs PO 拆分」的关系</b>：双视角归属规则为拆分提供底层纪律——契约层（合同/合同行）与执行层（履约行/SO 行/PO 行）分层，且执行层中"买方发起"的释放行在卖方侧只是引用镜像，真实拆分发生在卖方自有执行对象之间。</li>
+    </ol>
+    <table>
+      <thead><tr><th style="width:24%">链路</th><th style="width:76%">对象关系（组合 / 引用 / 镜像）</th></tr></thead>
+      <tbody>
+        <tr><td>标准合同</td><td><code>合同 → 合同行(组合) → 履约行(引用,BO) → {SO行/交货行/开票行}</code>；<code>合同行 → PO行(引用,BO)</code></td></tr>
+        <tr><td>框架合同</td><td><code>框架合同 → 框架合同行(组合) → 释放行(买方BO/卖方镜像) → {框架下PO行/履约行}</code></td></tr>
+        <tr><td>投标链</td><td><code>招标书(买方BO/卖方镜像) → 招标书接收档案(卖方BO) → 投标项目(BO) → 投标书 → 合同 → 履约</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="s7">
+    <h2>7 典型对象辨析</h2>
+    <table>
+      <thead><tr><th style="width:20%">对象</th><th style="width:48%">辨析依据</th><th style="width:32%">结论</th></tr></thead>
+      <tbody>
+        <tr><td><b>项目计划</b></td><td>虽引用项目信息，但其制定、调整、审批独立，生命周期与项目不一致。</td><td><span class="pill own">独立业务对象</span></td></tr>
+        <tr><td><b>项目风险</b></td><td>综合合同评审风险与项目假设变化新生成，非简单继承，管控逻辑独立。</td><td><span class="pill own">独立业务对象</span></td></tr>
+        <tr><td><b>发货单</b></td><td>基于生产结果与主计划生成，内容独立，仅关联计划编号，不内嵌于计划。</td><td><span class="pill own">独立业务对象</span></td></tr>
+        <tr><td><b>合同行</b></td><td>合同的组合子实体（part-of），生命周期嵌套于合同、归属方与合同头同一、默认嵌入合同内，三维均弱。</td><td>组合子实体（非 BO）</td></tr>
+        <tr><td><b>审批类单据</b></td><td>审批意见、签字等附着于主业务对象，不构成独立事务，无独立生命周期。</td><td><span class="pill att">非独立对象（附着性）</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note">双视角分裂类对象（框架释放行、招标书）的判定见第 6.6 节对照表，不在此重复。</p>
+  </section>
+
+  <section id="s8">
+    <h2>8 识别流程可视化</h2>
+    <p class="note">下图为正向识别 + 双视角修正 + 完整生命周期复核的端到端统一流程，含「声明视角」前置节点与「外部引用镜像」第三分支。</p>
+    <svg viewBox="0 0 880 600" role="img" aria-label="统一识别流程（正向+双视角+生命周期复核）">
+      <defs>
+        <marker id="ar2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#475569"/>
+        </marker>
+        <style>
+          .bx{fill:#fff;stroke:#1d4ed8;stroke-width:1.5;}
+          .bxg{fill:#eff6ff;stroke:#1d4ed8;stroke-width:1.5;}
+          .dx{fill:#fff;stroke:#0f766e;stroke-width:1.5;}
+          .ok{fill:#f0fdf4;stroke:#15803d;stroke-width:1.5;}
+          .no{fill:#fef2f2;stroke:#b91c1c;stroke-width:1.5;}
+          .mi{fill:#fef2f2;stroke:#b91c1c;stroke-width:1.5;}
+          .pu{fill:#f5f3ff;stroke:#7c3aed;stroke-width:1.5;}
+          .tt{font:600 12.5px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#1f2937;}
+          .ts{font:11px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#6b7280;}
+          .tc{font:600 12px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#0f766e;}
+          .tp{font:600 11px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#7c3aed;}
+        </style>
+      </defs>
+
+      <!-- 0 declare perspective -->
+      <rect class="pu" x="280" y="14" width="320" height="44" rx="9"/>
+      <text class="tp" x="440" y="35" text-anchor="middle">① 声明建模视角（买方 / 卖方 / 中立）</text>
+      <text class="ts" x="440" y="50" text-anchor="middle">DV-01 · 未声明不得下结论</text>
+
+      <!-- 1 take flow -->
+      <line x1="440" y1="58" x2="440" y2="88" stroke="#475569" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <rect class="bxg" x="300" y="88" width="280" height="40" rx="9"/>
+      <text class="tt" x="440" y="105" text-anchor="middle">② 业务流 / L3 活动节点</text>
+      <text class="ts" x="440" y="120" text-anchor="middle">锁定流程与节点（含发起方）</text>
+
+      <!-- 2 decompose -->
+      <line x1="440" y1="128" x2="440" y2="158" stroke="#475569" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <rect class="bx" x="290" y="158" width="300" height="40" rx="9"/>
+      <text class="tt" x="440" y="175" text-anchor="middle">③ 逐节点拆解：人 / 事 / 物 / 发起方</text>
+      <text class="ts" x="440" y="190" text-anchor="middle">谁在做？产生/消费什么实体？</text>
+
+      <!-- 3 candidate -->
+      <line x1="440" y1="198" x2="440" y2="228" stroke="#475569" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <rect class="bx" x="310" y="228" width="260" height="36" rx="9"/>
+      <text class="tt" x="440" y="250" text-anchor="middle">④ 列出业务对象候选</text>
+
+      <!-- 4 gateway three-dim -->
+      <line x1="440" y1="264" x2="440" y2="296" stroke="#475569" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <polygon class="dx" points="440,296 540,342 440,388 340,342"/>
+      <text class="tc" x="440" y="336" text-anchor="middle">⑤ 三维判定</text>
+      <text class="ts" x="440" y="352" text-anchor="middle">生命周期/归属方/引用</text>
+
+      <!-- branch A: 归属方≠视角 -> 外部 mirror -->
+      <line x1="340" y1="342" x2="150" y2="342" stroke="#b91c1c" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <text class="ts" x="245" y="333" text-anchor="middle" fill="#b91c1c">归属方≠视角</text>
+      <rect class="mi" x="14" y="318" width="136" height="48" rx="9"/>
+      <text class="tt" x="82" y="338" text-anchor="middle" fill="#b91c1c">外部引用镜像</text>
+      <text class="ts" x="82" y="354" text-anchor="middle">+下游接收/响应档案</text>
+
+      <!-- branch B: 满足独立 -> 独立BO -->
+      <line x1="540" y1="342" x2="730" y2="342" stroke="#15803d" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <text class="ts" x="635" y="333" text-anchor="middle" fill="#15803d">满足独立维度</text>
+      <rect class="ok" x="730" y="318" width="138" height="48" rx="9"/>
+      <text class="tt" x="799" y="338" text-anchor="middle" fill="#15803d">独立业务对象</text>
+      <text class="ts" x="799" y="354" text-anchor="middle">进入数据建模</text>
+
+      <!-- branch C: 均不满足 -> 附着 -->
+      <line x1="440" y1="388" x2="440" y2="430" stroke="#b91c1c" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <text class="ts" x="455" y="410" text-anchor="middle" fill="#b91c1c">均不满足</text>
+      <rect class="no" x="356" y="430" width="168" height="40" rx="9"/>
+      <text class="tt" x="440" y="455" text-anchor="middle" fill="#b91c1c">附着 / 内嵌</text>
+
+      <!-- 6 lifecycle review (converge) -->
+      <path d="M82,366 L82,500 L356,500 L356,478" fill="none" stroke="#475569" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <path d="M799,366 L799,500 L608,500 L608,478" fill="none" stroke="#475569" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <line x1="440" y1="470" x2="440" y2="500" stroke="#475569" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <rect class="pu" x="296" y="500" width="288" height="44" rx="9"/>
+      <text class="tp" x="440" y="521" text-anchor="middle">⑥ 完整生命周期二次复核</text>
+      <text class="ts" x="440" y="537" text-anchor="middle">计划→执行→监控→关闭？受管/值对象/镜像</text>
+
+      <!-- 7 output -->
+      <line x1="440" y1="544" x2="440" y2="574" stroke="#475569" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <rect class="bxg" x="300" y="574" width="280" height="22" rx="7"/>
+      <text class="tt" x="440" y="589" text-anchor="middle" style="font-size:11.5px">输出对象清单（含归属类型 + 生命周期等级）</text>
+    </svg>
+
+    <p class="note">下图为双视角归属判定示例：同一实体在买方侧为自有 BO，在卖方侧则拆为「外部引用镜像 + 接收/响应档案（自有 BO）」，下游响应链才是卖方真正需正向推导的自有 BO。</p>
+    <svg viewBox="0 0 880 320" role="img" aria-label="双视角归属判定示例">
+      <defs>
+        <marker id="ar3" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#475569"/>
+        </marker>
+        <style>
+          .bb{fill:#eff6ff;stroke:#1d4ed8;stroke-width:1.5;}
+          .ss{fill:#fef2f2;stroke:#b91c1c;stroke-width:1.5;}
+          .so{fill:#f0fdf4;stroke:#15803d;stroke-width:1.5;}
+          .tt{font:600 12.5px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#1f2937;}
+          .ts{font:11px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#6b7280;}
+          .tb{font:600 12px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#1d4ed8;}
+          .tr{font:600 12px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#b91c1c;}
+          .tg{font:600 12px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#15803d;}
+        </style>
+      </defs>
+
+      <!-- header -->
+      <text class="tb" x="220" y="30" text-anchor="middle" style="font-size:14px">买方侧（发起方）</text>
+      <text class="tr" x="660" y="30" text-anchor="middle" style="font-size:14px">卖方侧（响应方）</text>
+      <line x1="440" y1="44" x2="440" y2="296" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="5 5"/>
+
+      <!-- 招标书 -->
+      <rect class="bb" x="120" y="54" width="200" height="44" rx="9"/>
+      <text class="tt" x="220" y="72" text-anchor="middle">招标书 / RFQ</text>
+      <text class="ts" x="220" y="88" text-anchor="middle">自有 BO（编制/发布/评标）</text>
+      <line x1="320" y1="76" x2="560" y2="76" stroke="#b91c1c" stroke-width="1.5" marker-end="url(#ar3)" stroke-dasharray="6 4"/>
+      <text class="ts" x="440" y="68" text-anchor="middle" fill="#b91c1c">发起→响应</text>
+      <rect class="ss" x="560" y="54" width="200" height="44" rx="9"/>
+      <text class="tt" x="660" y="72" text-anchor="middle">招标书（镜像引用）</text>
+      <text class="ts" x="660" y="88" text-anchor="middle">外部引用镜像（DV-02/03）</text>
+
+      <!-- 接收档案 -->
+      <rect class="so" x="560" y="116" width="200" height="44" rx="9"/>
+      <text class="tt" x="660" y="134" text-anchor="middle">招标书接收档案</text>
+      <text class="ts" x="660" y="150" text-anchor="middle">自有 BO（DV-04）</text>
+      <line x1="580" y1="98" x2="660" y2="116" stroke="#15803d" stroke-width="1.4" marker-end="url(#ar3)"/>
+
+      <!-- 释放行 -->
+      <rect class="bb" x="120" y="180" width="200" height="44" rx="9"/>
+      <text class="tt" x="220" y="198" text-anchor="middle">框架释放行</text>
+      <text class="ts" x="220" y="214" text-anchor="middle">自有 BO（call-off）</text>
+      <line x1="320" y1="202" x2="560" y2="202" stroke="#b91c1c" stroke-width="1.5" marker-end="url(#ar3)" stroke-dasharray="6 4"/>
+      <rect class="ss" x="560" y="180" width="200" height="44" rx="9"/>
+      <text class="tt" x="660" y="198" text-anchor="middle">释放行（镜像）</text>
+      <text class="ts" x="660" y="214" text-anchor="middle">接收确认（DV-02/03）</text>
+
+      <!-- 下游自有BO -->
+      <rect class="so" x="560" y="244" width="200" height="44" rx="9"/>
+      <text class="tt" x="660" y="262" text-anchor="middle">投标项目→合同→履约行</text>
+      <text class="ts" x="660" y="278" text-anchor="middle">卖方自有 BO（DV-06）</text>
+      <line x1="660" y1="224" x2="660" y2="244" stroke="#15803d" stroke-width="1.4" marker-end="url(#ar3)"/>
+      <line x1="660" y1="158" x2="660" y2="180" stroke="#15803d" stroke-width="1.2" stroke-dasharray="3 3"/>
+    </svg>
+  </section>
+
+  <section id="s9">
+    <h2>9 禁止项与落地要求</h2>
+    <div class="rule">
+      <b>禁止项：</b>
+      <ul style="margin:8px 0 0">
+        <li>审批流、审批意见、签字等<b>附着性内容</b>不得设计为独立业务对象，应作为主业务对象的属性或关联记录。</li>
+        <li><b>未声明建模视角不得进行 BO 判定</b>（DV-01）。</li>
+        <li>不得将「买方发起、卖方响应」类外部对象在响应方侧建模为自有 BO 并纳入内部创建/审批流（DV-02/03）。</li>
+        <li>不得在响应方侧为外部对象强行套用"完整生命周期"状态机——其状态随发起方联动，仅接收/响应档案可自有生命周期（DV-04、二次复核）。</li>
+      </ul>
+    </div>
+    <div class="ok">
+      <b>落地要求：</b>本方法论作为后续数据建模的<b>统一标准</b>。所有业务对象识别（含合同、PO、项目计划、风险、发货单、招标书、释放行等）均须按「① 视角声明 → ② 正向识别 + 三维判定（含双视角修正）→ ③ 完整生命周期二次复核」执行。逆向 BI/表单法不再作为主要依据；双视角归属原则作为跨主体场景的强制修正层。
+    </div>
+  </section>
+
+  <section id="s10">
+    <h2>10 识别方法总览</h2>
+    <table>
+      <thead><tr><th style="width:12%">方法</th><th style="width:30%">做什么</th><th style="width:34%">解决的问题</th><th style="width:24%">输出</th></tr></thead>
+      <tbody>
+        <tr><td><b>① 正向识别</b></td><td>从业务能力出发，自上而下在业务流中推导对象</td><td>取代逆向 BI/表单法，避免对象被裁剪/遗漏</td><td>对象候选清单</td></tr>
+        <tr><td><b>② 三维判定 + 双视角修正</b></td><td>生命周期独立性 / 归属方分离 / 引用 vs 嵌入 + 跨主体修正</td><td>是否应独立建模；跨主体时修正"外部对象误当内部对象"</td><td>归属类型（自有/组合/镜像）</td></tr>
+        <tr><td><b>③ 生命周期复核</b></td><td>完整生命周期管理二次复核（计划→执行→监控→关闭）</td><td>是否需配状态机（受管实体 vs 不可变值对象 vs 引用镜像）</td><td>生命周期等级 + 落库口径</td></tr>
+      </tbody>
+    </table>
+    <p class="note">参考文档：《数据建模方法论-双视角归属识别规则》；《业务对象生命周期复核报告》。本规则与之同口径、可互引。</p>
+  </section>
+
+  <footer>
+    业务对象识别规则 · 正向识别原则　|　ToB 离散制造 · 合同管理 / 投标管理产品数据架构　|　V2.0 统一标准（含跨主体双视角归属修正层）
+  </footer>
+</div>
+</body>
+</html>
